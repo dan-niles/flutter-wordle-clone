@@ -7,6 +7,7 @@ enum LetterStatus { initial, notInWord, inWord, correct }
 class Letter extends Equatable {
   const Letter({
     required this.val,
+    this.status = LetterStatus.initial,
   });
 
   factory Letter.empty() => const Letter(val: '');
@@ -46,5 +47,5 @@ class Letter extends Equatable {
   }
 
   @override
-  List<Object?> get props => [val, status]
+  List<Object?> get props => [val, status];
 }
