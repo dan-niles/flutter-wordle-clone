@@ -34,10 +34,18 @@ class Keyboard extends StatelessWidget {
                   } else if (letter == 'ENTER') {
                     return _KeyboardButton.enter(onTap: onEnterTapped);
                   }
+
+                  final letterKey = letters.firstWhere(
+                    (e) => e.val == letter,
+                    orElse: () => Letter.empty(),
+                  );
+
                   return _KeyboardButton(
                     letter: letter,
                     onTap: () => onKeyTapped(letter),
-                    backgroundColor: Colors.grey,
+                    backgroundColor: letterKey != Letter.empty()
+                        ? letterKey.backgroundColor
+                        : Colors.grey,
                   );
                 }).toList(),
               ))
