@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:wordle_clone/wordle/wordle.dart';
 
@@ -17,6 +18,9 @@ class _WordleScreenState extends State<WordleScreen> {
 
   final List<Word> _board = List.generate(
       6, (_) => Word(letters: List.generate(5, (_) => Letter.empty())));
+
+  final List<List<GlobalKey<FlipCardState>>> _flipCardKeys = List.generate(
+      6, (_) => List.generate(5, (_) => GlobalKey<FlipCardState>()));
 
   int _currentWordIndex = 0;
 
@@ -48,14 +52,13 @@ class _WordleScreenState extends State<WordleScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Board(board: _board),
+          Board(board: _board, flipCardKeys: _flipCardKeys),
           const SizedBox(height: 80),
-          keyboard(
+          Keyboard(
               onKeyTapped: _onKeyTapped,
               onDeleteTapped: _onDeleteTapped,
               onEnterTapped: _onEnterTapped,
-              letters: _keyboardLetters
-            )
+              letters: _keyboardLetters)
         ],
       ),
     );
@@ -73,7 +76,7 @@ class _WordleScreenState extends State<WordleScreen> {
     }
   }
 
-  void _onEnterTapped() {
+  Future<void> _onEnterTapped() async {
     if (_gamestatus == GameStatus.playing &&
         _currentWord != null &&
         !_currentWord!.letters.contains(Letter.empty())) {
@@ -95,6 +98,21 @@ class _WordleScreenState extends State<WordleScreen> {
                 currentWordLetter.copyWith(status: LetterStatus.notInWord);
           }
         });
+
+        final letter = _keyboardLetters.firstWhere(
+          (e) => e.val == currentWordLetter.val,
+          orElse: () => Letter.empty(),
+        );
+
+        if (letter.status != LetterStatus.correct) {
+          _keyboardLetters.removeWhere((e) => e.val == currentWordLetter.val);
+          _keyboardLetters.add(_currentWord!.letters[i]);
+        }
+
+        await Future.delayed(
+          const Duration(milliseconds: 150),
+          () => _flipCardKeys[_currentWordIndex][i].currentState?.toggleCard(),
+        );
       }
 
       _checkIfWinOrLoss();
@@ -133,8 +151,13 @@ class _WordleScreenState extends State<WordleScreen> {
         ..addAll(List.generate(
             6, (_) => Word(letters: List.generate(5, (_) => Letter.empty()))));
       _solution = Word.fromString(
-        fiveLetterWords[Random().nextInt(fiveLetterWords.length)].toUpperCase();
-      );
+          fiveLetterWords[Random().nextInt(fiveLetterWords.length)]
+              .toUpperCase());
+      _flipCardKeys
+        ..clear()
+        ..addAll(List.generate(
+            6, (_) => List.generate(5, (_) => GlobalKey<FlipCardState>())));
+      _keyboardLetters.clear();
     });
   }
 }
