@@ -7,7 +7,6 @@ enum LetterStatus { initial, notInWord, inWord, correct }
 class Letter extends Equatable {
   const Letter({
     required this.val,
-    required LetterStatus status,
   });
 
   factory Letter.empty() => const Letter(val: '');
