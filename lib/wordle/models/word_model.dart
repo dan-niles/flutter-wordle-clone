@@ -4,11 +4,13 @@ import 'package:wordle_clone/wordle/wordle.dart';
 class Word extends Equatable {
   const Word({required this.letters});
 
+  // Split word into letters
   factory Word.fromString(String word) =>
       Word(letters: word.split('').map((e) => Letter(val: e)).toList());
 
   final List<Letter> letters;
 
+  // Convert letters into word
   String get wordString => letters.map((e) => e.val).join();
 
   void addLetter(String val) {
