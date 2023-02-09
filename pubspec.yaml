@@ -30,7 +30,6 @@ environment:
 dependencies:
   equatable: ^2.0.3
   flip_card: ^0.6.0
-
   flutter:
     sdk: flutter
 
